@@ -16,8 +16,7 @@ def crop_300n(img):
     b, r = tb//2, lr//2
     t, l = tb-b, lr-r
     b, r = img_res[1]-b, img_res[0]-r
-    img = img.crop((l, t, r, b))
-    return img
+    return img.crop((l, t, r, b))
 
 
 def fill_300n(img):
@@ -50,6 +49,6 @@ def training_data( raw_dir, trg_dir, prefix ): #convert pictures to 300 by 300
         file_name = prefix + int(2-np.floor(np.log10(i+1)))*zero + str(i+1) + ".jpg"
         resize_B3(img).save( trg_dir + "/" + file_name )
         progress = round((i+1)*20/nfile)
-        print(f"{a*progress + c + b*(20-progress) + d + b*2}  Converting.....  {i+1}/{nfile}", end = '\r')
+        print(f"{a*progress + c + b*(20-progress) + d}   Converting.....  {i+1}/{nfile}", end = '\r')
         
 
