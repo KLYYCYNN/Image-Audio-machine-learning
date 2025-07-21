@@ -40,15 +40,25 @@ def resize_B3(img):
     return img.resize((300,300))
 
 
-def training_data( raw_dir, trg_dir, prefix ): #convert pictures to 300 by 300
-    file_names = os.listdir(raw_dir)
+def training_data( src_dir, trg_dir, prefix, n_start=0 ):
+    file_names = os.listdir(src_dir)
     nfile = len(file_names)
     zero, a, b, c, d = "0", "--", "  ", ">", "|"
     for i in range(nfile):
-        img = Image.open( raw_dir + "/" + file_names[i] )
-        file_name = prefix + int(2-np.floor(np.log10(i+1)))*zero + str(i+1) + ".jpg"
+        img = Image.open( src_dir + "/" + file_names[i] )
+        file_name = prefix + int(2-np.floor(np.log10(i+1+n_start)))*zero + str(i+1+n_start) + ".jpg"
         resize_B3(img).save( trg_dir + "/" + file_name )
         progress = round((i+1)*20/nfile)
         print(f"{a*progress + c + b*(20-progress) + d}   Converting.....  {i+1}/{nfile}", end = '\r')
         
+#%%
+
+#  crop_300n:  Crop the image to a square with side length being multiple of 300
+#works the best this way to later resize it to 300*300.
+#  fill_300n: fill the shorter side of the image with symmetric black strips to make its
+#number of pixels multiple of 300, prevents too much of the longer side being cropped off.
+#  training_data: takes in entire folder of pictures and change their dimension for neural
+#network inputs, saving to another folder. src_dir and trg_dir are source and target directories.
+#This function automatically name the processed pictures with a serial number, prefix + 000 
+#by default, you can offset 000 to any number using the optional argument n_start.
 
