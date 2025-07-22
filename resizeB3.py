@@ -81,15 +81,16 @@ def training_data( src_dir, trg_dir, prefix, n_start=0 ):
 #%%
 
 #  crop_300n:  Crop the image to a square with side length being multiple of 300
-#works the best this way to later resize it to 300*300.
+#  works the best this way to later resize it to 300*300.
 
 #  fill_300n: fill the shorter side of the image with symmetric black strips to make its
-#number of pixels multiple of 300, prevents too much of the longer side being cropped off.
+#  number of pixels multiple of 300, prevents too much of the longer side being cropped off.
 
-#  training_data: takes in entire folder of pictures and change their dimension for neural
-#network inputs, saving to another folder. src_dir and trg_dir are source and target directories.
-#This function automatically name the processed pictures with a serial number, prefix + 000 
-#by default, you can offset 000 to any number using the optional argument n_start.
+#  training_data: takes in entire folder of pictures and change their dimensions for neural
+#  network inputs, saving to another folder. src_dir and trg_dir are source and target directories.
+#  This function automatically name the processed pictures with a serial number, starting from
+#  prefix + 001 by default, you can offset 001 to any number using the optional argument n_start
+#  to avoid existing files in the target folder being overwritten.
 
-# clean_data_directory: delete any file in a directory meant to store training data that is not a .jpg
-#or a .jpeg file. Directories with other kinds of file will make training_data crush.
+#  The function training_data automatically delete non-image files and files that can't be converted
+#  to .jpg in the source directory.
