@@ -52,9 +52,17 @@ def resize_B3(img):
     else:
         img = crop_300n(fill_300n( img ))
     return img.resize((300,300))
+    
+
+def clean_data_directory( directory ):
+    file_names = os.listdir( directory )
+    for i in range(len(file_names)):
+        if check_image_file(file_names[i]):
+            os.remove( directory + "/" + file_names[i] )
 
 
 def training_data( src_dir, trg_dir, prefix, n_start=0 ): 
+    clean_data_directory(src_dir)
     file_names = os.listdir(src_dir)
     nfile = len(file_names)
     zero, a, b, c, d = "0", "--", "  ", ">", "|"
@@ -70,13 +78,6 @@ def training_data( src_dir, trg_dir, prefix, n_start=0 ):
     print(f"{b*11}successfully added {len(os.listdir(trg_dir))} images{b*11}")
         
     
-def clean_data_directory( directory ):
-    file_names = os.listdir( directory )
-    for i in range(len(file_names)):
-        if check_image_file(file_names[i]):
-            os.remove( directory + "/" + file_names[i] )
-                   
-        
 #%%
 
 #  crop_300n:  Crop the image to a square with side length being multiple of 300
