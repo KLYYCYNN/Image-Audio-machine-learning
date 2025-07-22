@@ -30,22 +30,27 @@ def crop_300n(img):
 
 def fill_300n(img):
     img_arr = np.array(img)
+    if img_arr.shape[2] != 3:
+        return 0
     img_res = np.delete(np.array(img_arr.shape), -1)
     argmin = np.argmin(img_res)
     n = int(np.ceil( img_res[argmin]/300 ))
     n1 = (300*n - img_res[argmin]) // 2
     n2 = (300*n - img_res[argmin]) - n1
-    k1, k2 = np.zeros((n1, img_res[1-argmin], 3)), np.zeros((n2, img_res[1-argmin], 3))
+    k1, k2 = np.zeros((n1, img_res[1-argmin], img_arr.shape[2])), np.zeros((n2, img_res[1-argmin], img_arr.shape[2]))
     img_arr = np.insert(img_arr, 0, k1, axis = argmin)
     img_arr = np.insert(img_arr, -1, k2, axis = argmin)
     return Image.fromarray( img_arr.astype(np.uint8) )
 
 
 def resize_B3(img):
-    if abs( img.size[0] - img.size[1] ) > 300:
-        img = crop_300n( fill_300n(img) )
+    img = fill_300n(img)
+    if img == 0:
+        return img
+    elif abs( img.size[0] - img.size[1] ) > 300:
+        img = crop_300n(img)
     else:
-        img = crop_300n(fill_300n( fill_300n(img) ))
+        img = crop_300n(fill_300n( img ))
     return img.resize((300,300))
 
 
@@ -54,12 +59,17 @@ def training_data( src_dir, trg_dir, prefix, n_start=0 ):
     nfile = len(file_names)
     zero, a, b, c, d = "0", "--", "  ", ">", "|"
     for i in range(nfile):
-        img = Image.open( src_dir + "/" + file_names[i] )
-        file_name = prefix + int(2-np.floor(np.log10(i+1+n_start)))*zero + str(i+1+n_start) + ".jpg"
-        resize_B3(img).save( trg_dir + "/" + file_name )
+        img = resize_B3( Image.open( src_dir + "/" + file_names[i] ) )
+        if img != 0:
+            file_name = prefix + int(2-np.floor(np.log10(i+1+n_start)))*zero + str(i+1+n_start) + ".jpg"
+            img.save( trg_dir + "/" + file_name )
+        else:
+            os.remove(src_dir + "/" + file_names[i])
         progress = round((i+1)*20/nfile)
         print(f"{a*progress + c + b*(20-progress) + d}   Converting.....  {i+1}/{nfile}", end = '\r')
+    print(f"{b*11}successfully added {len(os.listdir(trg_dir))} images{b*11}")
         
+    
 def clean_data_directory( directory ):
     file_names = os.listdir( directory )
     for i in range(len(file_names)):
