@@ -4,7 +4,7 @@ import os
 
 # %%
 
-def clean_datastructure(folder_path, classes, action="check"):
+def clean_datastructure(folder_path, classes, action="check"): # possibly enough to just use clean_ghost_files instead of this one
     assert action == "check" or "delete", "invalid action"
     folder_contents, inpurities = os.listdir(folder_path), []
     for i in folder_contents:
