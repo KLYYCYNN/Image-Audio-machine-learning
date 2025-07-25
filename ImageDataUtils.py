@@ -2,7 +2,7 @@ import numpy as np
 from PIL import Image
 import os
 
-# %%
+# %%   
 
 def clean_datastructure(folder_path, classes, action="check"): # possibly enough to just use clean_ghost_files instead of this one
     assert action == "check" or "delete", "invalid action"
@@ -17,19 +17,7 @@ def clean_datastructure(folder_path, classes, action="check"): # possibly enough
             os.remove( os.path.join(folder_path, i) )
             
             
-def clean_function(img):
-    if img[0] == ".":
-        return True
-
-
-def clean_ghost_files(folder_path):
-    images = os.listdir(folder_path)
-    for i in images:
-        if clean_function(i):
-            os.remove( os.path.join(folder_path, i) )
-
-
-def check_image_file(file_name): #unused function
+def check_image_file(file_name): 
     image_suffixes = [".jpg", "jpeg", ".JPG", "JPEG"]
     file_suffix = file_name[-4] + file_name[-3] + file_name[-2] + file_name[-1]
     for image_suffix in image_suffixes:
@@ -37,6 +25,31 @@ def check_image_file(file_name): #unused function
                 return False
     return True
 
+
+def clean_data_directory( directory ): 
+    file_names = os.listdir( directory )
+    for i in range(len(file_names)):
+        if check_image_file(file_names[i]):
+            os.remove( directory + "/" + file_names[i] )
+            
+            
+# %%
+
+def clean_ghost_files(folder_path):
+    for i in os.listdir(folder_path):
+        if i[0] == ".":
+            os.remove( os.path.join(folder_path, i) )            
+
+
+def prep_ds(folder):
+    clean_ghost_files(folder)
+    for i in os.listdir(folder):
+        subfolder = os.path.join( folder, i )
+        clean_ghost_files(subfolder)
+        print(f"category {chr(34)}{i}{chr(34)}    {len(os.listdir(subfolder))} images")
+
+
+# %%
 
 def crop_300n(img):
     img_res = np.array(img.size)
@@ -75,15 +88,9 @@ def resize_B3(img):
     return img.resize((300,300))
 
 
-def clean_data_directory( directory ): #unused function
-    file_names = os.listdir( directory )
-    for i in range(len(file_names)):
-        if check_image_file(file_names[i]):
-            os.remove( directory + "/" + file_names[i] )
-
-
 def training_data( src_dir, trg_dir, prefix, n_start=0 ):
     clean_ghost_files( src_dir )
+    clean_data_directory( src_dir )
     file_names = os.listdir(src_dir)
     nfile = len(file_names)
     zero, a, b, c, d = "0", "--", "  ", ">", "|"
@@ -98,6 +105,7 @@ def training_data( src_dir, trg_dir, prefix, n_start=0 ):
         print(f"{a*progress + c + b*(20-progress) + d}   Converting.....  {i+1}/{nfile}", end = '\r')
     print(f"{b*11}successfully added {len(os.listdir(trg_dir))} images{b*11}")
     
+
 #%%
 
 #  crop_300n:  Crop the image to a square with side length being multiple of 300
@@ -114,3 +122,6 @@ def training_data( src_dir, trg_dir, prefix, n_start=0 ):
 
 #  The function training_data automatically delete non-image files and files that can't be converted
 #  to .jpg in the source directory.
+
+#  prep_ds can be used to check the training data of image classification algoirthms. It prints the 
+#  name and the number of images of each category and deletes ghost files.
