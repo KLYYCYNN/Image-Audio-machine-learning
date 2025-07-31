@@ -1,13 +1,10 @@
-#%%
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-from tensorflow.keras.models import load_model 
+#from tensorflow.keras.models import load_model   Must have this line to use any functions here
 from PIL.Image import open
 plt.rcParams['figure.figsize'] = (8, 6)
-#%%
-model = load_model( "models/vehicle_recognition_algorithm1_2.keras" )
-#%%
+
 
 def get_serial(n):
     return int(2-np.floor(np.log10(n)))*"0" + str(n)
@@ -62,9 +59,7 @@ def eval_ds(model, ds, save=False, exp_path=None, plot=True):
         n_total += len(os.listdir(folder))
     print(f"overall accuracy: {np.round(1-n_start/n_total, 4)}")
 
-eval_ds(model, "data/Testing", save=True, exp_path="failure cases", plot = False)
 
-# %%
 def predict_image( model, image_path, classes ):
     classes.sort()
     image = np.array( open(image_path) )
@@ -93,25 +88,3 @@ def predict_folder( model, folder_path, classes ):
         ax1.set_axis_off()
         ax1.set_title(f"{classes[predictions[i]]}", fontsize = 15)
         plt.show()
-
-predict_folder(model, "data/Testing/van", ["SUV", "van", "pickup"])
-#%%
-print(os.listdir("data/Testing"))
-# classes = os.listdir("data/Testing")
-# classes.sort()
-# image_list = os.listdir(test_folder)
-# image_paths = [ os.path.join( test_folder, img ) for img in image_list ]
-# test_data = np.array([ np.array( open(i) ) for i in image_paths ])
-# correct_class = 0
-# prd_arr = model.predict(test_data)
-# predictions = np.array([ np.argmax(i) for i in prd_arr ])
-# for i in range(len(predictions)):
-#     if predictions[i] != correct_class:
-#         fig, (ax1, ax2) = plt.subplots(1, 2)
-#         ax1.imshow(test_data[i])
-#         ax2.bar(classes, prd_arr[i])
-#         ax1.set_axis_off()
-#         ax1.set_title(f"{classes[predictions[i]]} ({classes[correct_class]})")
-#         plt.show()
-
-# %%
