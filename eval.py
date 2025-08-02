@@ -1,8 +1,8 @@
 import os
 import numpy as np
 import matplotlib.pyplot as plt
-#from tensorflow.keras.models import load_model   Must have this line to use any functions here
 from PIL.Image import open
+from seaborn import heatmap
 plt.rcParams['figure.figsize'] = (8, 6)
 
 
@@ -88,3 +88,40 @@ def predict_folder( model, folder_path, classes ):
         ax1.set_axis_off()
         ax1.set_title(f"{classes[predictions[i]]}", fontsize = 15)
         plt.show()
+
+
+def cfs_mat(model, ds):
+    classes = os.listdir(ds)
+    classes.sort()
+    cfs_mat = np.zeros((len(classes), len(classes)))
+    for i in range(len(classes)):
+        folder = os.path.join(ds, classes[i])
+        image_list = os.listdir(folder)
+        image_paths = [ os.path.join(folder, img) for img in image_list ]
+        test_data = np.array( [ np.array(open(i)) for i in image_paths ] )
+        prd_arr = model.predict(test_data)
+        predictions = [ np.argmax(i) for i in prd_arr ]
+        for j in range(len(classes)):
+            cfs_mat[i][j] = predictions.count(j)
+    return cfs_mat
+
+
+def plot_cfs_mat(model, ds, n=False, cmap="YlGnBu"):
+    fig, ax = plt.subplots()
+    classes = os.listdir(ds)
+    classes.sort()
+    confusion_matrix = cfs_mat(model, ds)
+    if n:
+        confusion_matrix = confusion_matrix / np.sum(confusion_matrix)
+    plotargs = {
+        "data": confusion_matrix,
+        "ax": ax,
+        "annot": True,
+        "cmap": cmap,
+        "xticklabels": classes,
+        "yticklabels": classes
+    }
+    heatmap(**plotargs)
+    ax.set_xlabel("Predicted", fontsize=15, color="blue")
+    ax.set_ylabel("Actual", fontsize=15, color="blue")
+    plt.show()
